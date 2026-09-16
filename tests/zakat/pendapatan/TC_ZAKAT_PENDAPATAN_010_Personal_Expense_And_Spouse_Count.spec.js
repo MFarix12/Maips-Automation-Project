@@ -1,23 +1,115 @@
 const { test } = require('@playwright/test');
-const { ZakatPendapatanPage } = require('../../../pages/zakat/ZakatPendapatanPage');
+const {
+    ZakatPendapatanPage
+} = require('../../../pages/zakat/ZakatPendapatanPage');
 
-test('TC_ZAKAT_PENDAPATAN_010 - Personal Expense And Spouse Count', async ({ page }) => {
-    const zakat = new ZakatPendapatanPage(page);
-    const monthlyIncome = 5000;
-    const bonus = 1000;
-    const otherIncome = 100;
-    const personalExpense = 1000;
-    const spouseCount = 1;
+test.describe('Zakat Pendapatan - Personal Expense And Spouse Count', () => {
 
-    await zakat.open();
-    await zakat.openZakatPendapatan();
-    await zakat.openIncomeCalculator();
-    await zakat.enterIncomeInformation(monthlyIncome, bonus, otherIncome);
-    await zakat.clickNext();
-    await zakat.verifyCalculatorStep2();
-    await zakat.enterPersonalExpense(personalExpense);
-    await zakat.verifyPersonalExpense(personalExpense);
-    await zakat.enterSpouseCount(spouseCount);
-    await zakat.verifySpouseCount(spouseCount);
-    console.log('TC_ZAKAT_PENDAPATAN_010 PASSED');
+    test(
+        'TC_ZAKAT_PENDAPATAN_010 - Personal Expense And Spouse Count',
+        async ({ page }) => {
+
+            const zakatPage = new ZakatPendapatanPage(page);
+
+            // =====================================================
+            // TEST DATA
+            // =====================================================
+
+            const monthlyIncome = 5000;
+            const bonus = 1000;
+            const otherIncome = 100;
+
+            const personalExpense = 1000;
+            const spouseCount = 1;
+
+
+            // =====================================================
+            // STEP 1 - OPEN MAIPS
+            // =====================================================
+
+            await zakatPage.open();
+
+
+            // =====================================================
+            // STEP 2 - OPEN ZAKAT PENDAPATAN
+            // =====================================================
+
+            await zakatPage.openZakatPendapatan();
+
+            await zakatPage.verifyZakatPendapatanPage();
+
+
+            // =====================================================
+            // STEP 3 - OPEN CALCULATOR
+            // =====================================================
+
+            await zakatPage.openIncomeCalculator();
+
+            await zakatPage.verifyCalculatorStep1();
+
+
+            // =====================================================
+            // STEP 4 - ENTER INCOME
+            // =====================================================
+
+            await zakatPage.enterIncomeInformation(
+                monthlyIncome,
+                bonus,
+                otherIncome
+            );
+
+
+            // =====================================================
+            // STEP 5 - VERIFY INCOME
+            // =====================================================
+
+            await zakatPage.verifyIncomeValues(
+                monthlyIncome,
+                bonus,
+                otherIncome
+            );
+
+
+            // =====================================================
+            // STEP 6 - GO TO EXPENSE STEP
+            // =====================================================
+
+            await zakatPage.clickNext();
+
+            await zakatPage.verifyCalculatorStep2();
+
+
+            // =====================================================
+            // STEP 7 - ENTER PERSONAL EXPENSE
+            // =====================================================
+
+            await zakatPage.enterPersonalExpense(
+                personalExpense
+            );
+
+            await zakatPage.verifyPersonalExpense(
+                personalExpense
+            );
+
+
+            // =====================================================
+            // STEP 8 - ENTER SPOUSE COUNT
+            // =====================================================
+
+            await zakatPage.enterSpouseCount(
+                spouseCount
+            );
+
+            await zakatPage.verifySpouseCount(
+                spouseCount
+            );
+
+
+            // =====================================================
+            // STEP 9 - CONTINUE TO RESULT
+            // =====================================================
+
+            await zakatPage.clickNext();
+        }
+    );
 });
