@@ -8,78 +8,170 @@ class ZakatPendapatanPage {
 
 
         // =====================================================
-        // MAIN PAGE
+        // ZAKAT PENDAPATAN PAGE
         // =====================================================
 
         this.zakatPendapatanCalculateButton =
-            page.getByRole('link', { name: 'Kira Sekarang' }).first();
+            page.getByRole(
+                'link',
+                { name: 'Kira Sekarang' }
+            ).first();
 
         this.zakatPendapatanHeading =
-            page.getByText('Zakat Pendapatan', { exact: true });
+            page.locator('vaadin-form-layout')
+                .getByText(
+                    'Zakat Pendapatan',
+                    { exact: true }
+                );
+
+
+        // =====================================================
+        // CALCULATOR
+        // =====================================================
 
         this.openCalculatorButton =
-            page.getByRole('button', { name: 'Buka Kalkulator' });
-
-        this.paymentCartHeading =
-            page.getByText('Bakul Bayaran', { exact: true });
-
-        this.emptyCartMessage =
-            page.getByText(/bakul.*kosong/i);
-
-        this.payButton =
-            page.getByRole('button', { name: /Bayar RM/i});
-
-
-        // =====================================================
-        // CALCULATOR CONTAINER
-        // =====================================================
+            page.getByRole(
+                'button',
+                { name: 'Buka Kalkulator' }
+            );
 
         this.calculatorContainer =
-            page.locator('#kalkulatorContentLayout');
+            page.locator(
+                '#kalkulatorContentLayout'
+            );
 
-        this.addToCartButton =
-            this.calculatorContainer.getByRole(
-                'button',
-                { name: 'Masuk Troli' }
+        this.closeCalculatorButton =
+            page.locator(
+                '.w-full.p-s > vaadin-button'
             );
 
 
         // =====================================================
-        // STEP 1 - INCOME
+        // PAYMENT CART
         // =====================================================
 
-        this.calculatorHeading =
-            page.getByText(/Kalkulator/i).first();
+        this.paymentCartHeading =
+            page.getByRole(
+                'heading',
+                { name: 'Bakul Bayaran' }
+            );
 
-        this.monthlyIncomeOption =
-            page.getByText('Bulanan', { exact: true });
+        this.emptyCartMessage =
+            page.getByText(
+                /bakul.*kosong/i
+            );
 
-        this.annualIncomeOption =
-            page.getByText('Tahunan', { exact: true });
+        this.payButton =
+            page.getByRole(
+                'button',
+                { name: /Bayar RM/i }
+            );
 
-        this.monthlyIncomeLabel =
-            page.getByText('Pendapatan', { exact: true });
+        this.addToCartButton =
+            this.calculatorContainer
+                .getByRole(
+                    'button',
+                    { name: 'Masuk Troli' }
+                );
 
-        this.bonusLabel =
-            page.getByText('Bonus', { exact: true });
 
-        this.otherIncomeLabel =
-            page.getByText('Pendapatan Lain', { exact: true });
+        // =====================================================
+        // ADD TO CART SUCCESS NOTIFICATION
+        // =====================================================
 
-        this.totalIncomeLabel =
-            page.getByText(/Jumlah Pendapatan/i);
+        this.addToCartSuccessNotification =
+            page.getByText(
+                /Jumlah telah ditambah ke bakul bayaran/i
+            );
+
+
+        // =====================================================
+// CART - ZAKAT PENDAPATAN
+// =====================================================
+
+this.cartZakatPendapatanItem =
+    page.getByText(
+        'Zakat Pendapatan',
+        { exact: true }
+    );
+
+this.cartYear2026 =
+    page.getByText(
+        '2026',
+        { exact: true }
+    );
+
+this.cartAmount11062 =
+    page.getByText(
+        'RM 110.62',
+        { exact: true }
+    );
+
+this.cartPayButton =
+    page.getByRole(
+        'button',
+        { name: 'Bayar RM 110.62' }
+    );
+
+
+        // =====================================================
+        // MANUAL ZAKAT PAYMENT
+        // =====================================================
+
+        this.haulFormItem =
+            page.locator('vaadin-form-item')
+                .filter({
+                    hasText: 'Tahun/Haul'
+                });
+
+        this.haulToggleButton =
+            this.haulFormItem
+                .locator('#toggleButton');
+
+        this.manualZakatAmountField =
+            page.getByRole(
+                'textbox',
+                { name: 'Jumlah Bayaran' }
+            );
+
+
+        // =====================================================
+        // STEP 1 - INCOME INFORMATION
+        // =====================================================
 
         /*
-         * Confirmed through Codegen.
+         * IMPORTANT:
          *
-         * Vaadin-generated ID. Used for the initial Step 1
-         * interaction only.
+         * Vaadin dynamically changes the ID of the monthly
+         * income field.
+         *
+         * Example:
+         *
+         * Initial:
+         * input-vaadin-big-decimal-field-40
+         *
+         * After returning to Step 1:
+         * input-vaadin-big-decimal-field-167
+         *
+         * Therefore:
+         * - use stable ID prefix
+         * - scope inside calculator
+         *
+         * This prevents Playwright from accidentally filling
+         * the main "Jumlah Bayaran" field.
          */
         this.monthlyIncomeField =
-            page.locator('#input-vaadin-big-decimal-field-40');
+            this.calculatorContainer
+                .locator(
+                    '[id^="input-vaadin-big-decimal-field-"]'
+                )
+                .first();
 
         this.bonusField =
-            page.getByRole('textbox', { name: 'Bonus' });
+            page.getByRole(
+                'textbox',
+                { name: 'Bonus' }
+            );
 
         this.otherIncomeField =
             page.getByRole(
@@ -87,9 +179,11 @@ class ZakatPendapatanPage {
                 { name: 'Pendapatan Lain' }
             );
 
-        /*
-         * Confirmed through Codegen.
-         */
+
+        // =====================================================
+        // MONTHLY / ANNUAL MODE
+        // =====================================================
+
         this.annualModeButton =
             page.locator(
                 '.flex-1.gap-xs.items-center.justify-center.p-s.rounded-l.pointer.gray-card-bg'
@@ -113,14 +207,15 @@ class ZakatPendapatanPage {
             );
 
         this.previousButton =
-            this.calculatorContainer.getByRole(
-                'button',
-                { name: 'Sebelum' }
-            );
+            this.calculatorContainer
+                .getByRole(
+                    'button',
+                    { name: 'Sebelum' }
+                );
 
 
         // =====================================================
-        // STEP 2 - EXPENSES
+        // STEP 2 - EXPENSE INFORMATION
         // =====================================================
 
         this.personalExpenseField =
@@ -183,51 +278,36 @@ class ZakatPendapatanPage {
                 { name: 'Caruman Tabung Haji' }
             );
 
+            // =====================================================
+// REMOVE ITEM FROM CART
+// =====================================================
 
-        // =====================================================
-        // STEP 3 - RESULT
-        // =====================================================
+this.cartDeleteButton =
+    page.locator(
+        'vaadin-grid-cell-content:nth-child(19) > vaadin-horizontal-layout > vaadin-button'
+    );
 
-        this.resultContainer =
-            this.calculatorContainer;
+this.emptyCartRecordMessage =
+    page.getByText(
+        /Rekod tidak ditemui.*Sila klik Masuk Troli untuk tambah item/i
+    );
 
-        this.nisabLabel =
-            this.resultContainer.getByText(
-                /Nisab.*Tahun/i
-            );
+this.emptyCartTotal =
+    page.getByText(
+        'RM 0.00',
+        { exact: true }
+    );
 
-        this.totalIncomeResultLabel =
-            this.resultContainer.getByText(
-                'Jumlah Pendapatan',
-                { exact: true }
-            );
-
-        this.totalExpenseResultLabel =
-            this.resultContainer.getByText(
-                'Jumlah Perbelanjaan',
-                { exact: true }
-            );
-
-        this.netIncomeResultLabel =
-            this.resultContainer.getByText(
-                'Jumlah Pendapatan Bersih',
-                { exact: true }
-            );
-
-        this.monthlyZakatLabel =
-            this.resultContainer.getByText(
-                /Jumlah Zakat Sebulan/i
-            );
-
-        this.zakatRateLabel =
-            this.resultContainer.getByText(
-                /2\.5%/
-            );
+this.emptyCartPayButton =
+    page.getByRole(
+        'button',
+        { name: 'Bayar', exact: true }
+    );
     }
 
 
     // =========================================================
-    // OPEN HOME
+    // OPEN MAIPS
     // =========================================================
 
     async open() {
@@ -253,20 +333,28 @@ class ZakatPendapatanPage {
         });
 
         await this.zakatPendapatanCalculateButton.click();
+
+        await this.page.waitForLoadState(
+            'domcontentloaded'
+        );
     }
 
 
     // =========================================================
-    // VERIFY ZAKAT PAGE
+    // VERIFY ZAKAT PENDAPATAN PAGE
     // =========================================================
 
     async verifyZakatPendapatanPage() {
 
         await expect(
-            this.openCalculatorButton
+            this.zakatPendapatanHeading
         ).toBeVisible({
             timeout: 15000
         });
+
+        await expect(
+            this.openCalculatorButton
+        ).toBeVisible();
     }
 
 
@@ -280,28 +368,18 @@ class ZakatPendapatanPage {
             this.openCalculatorButton
         ).toBeVisible();
 
-        if (
-            await this.paymentCartHeading.count() > 0
-        ) {
+        await expect(
+            this.paymentCartHeading
+        ).toBeVisible();
 
-            await expect(
-                this.paymentCartHeading
-            ).toBeVisible();
-        }
-
-        if (
-            await this.emptyCartMessage.count() > 0
-        ) {
-
-            await expect(
-                this.emptyCartMessage
-            ).toBeVisible();
-        }
+        await expect(
+            this.addToCartButton
+        ).toHaveCount(0);
     }
 
 
     // =========================================================
-    // OPEN CALCULATOR
+    // OPEN INCOME CALCULATOR
     // =========================================================
 
     async openIncomeCalculator() {
@@ -313,11 +391,47 @@ class ZakatPendapatanPage {
         });
 
         await this.openCalculatorButton.click();
+
+        await expect(
+            this.calculatorContainer
+        ).toBeVisible({
+            timeout: 15000
+        });
     }
 
 
     // =========================================================
-    // VERIFY STEP 1
+    // CLOSE CALCULATOR
+    // =========================================================
+
+    async closeCalculator() {
+
+        await expect(
+            this.closeCalculatorButton
+        ).toBeVisible({
+            timeout: 15000
+        });
+
+        await expect(
+            this.closeCalculatorButton
+        ).toBeEnabled();
+
+        await this.closeCalculatorButton.click();
+
+        /*
+         * MAIPS keeps calculator-related DOM mounted.
+         * Do not assert calculatorContainer is removed.
+         */
+        await expect(
+            this.openCalculatorButton
+        ).toBeVisible({
+            timeout: 15000
+        });
+    }
+
+
+    // =========================================================
+    // VERIFY CALCULATOR STEP 1
     // =========================================================
 
     async verifyCalculatorStep1() {
@@ -343,7 +457,7 @@ class ZakatPendapatanPage {
 
 
     // =========================================================
-    // MONTHLY INCOME
+    // ENTER MONTHLY INCOME
     // =========================================================
 
     async enterMonthlyIncome(amount) {
@@ -355,13 +469,13 @@ class ZakatPendapatanPage {
         });
 
         await this.monthlyIncomeField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // BONUS
+    // ENTER BONUS
     // =========================================================
 
     async enterBonus(amount) {
@@ -373,13 +487,13 @@ class ZakatPendapatanPage {
         });
 
         await this.bonusField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // OTHER INCOME
+    // ENTER OTHER INCOME
     // =========================================================
 
     async enterOtherIncome(amount) {
@@ -391,7 +505,7 @@ class ZakatPendapatanPage {
         });
 
         await this.otherIncomeField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
@@ -421,7 +535,7 @@ class ZakatPendapatanPage {
 
 
     // =========================================================
-    // VERIFY MONTHLY VALUES
+    // VERIFY MONTHLY INCOME VALUES
     // =========================================================
 
     async verifyIncomeValues(
@@ -433,25 +547,25 @@ class ZakatPendapatanPage {
         await expect(
             this.monthlyIncomeField
         ).toHaveValue(
-            monthlyIncome.toString()
+            String(monthlyIncome)
         );
 
         await expect(
             this.bonusField
         ).toHaveValue(
-            bonus.toString()
+            String(bonus)
         );
 
         await expect(
             this.otherIncomeField
         ).toHaveValue(
-            otherIncome.toString()
+            String(otherIncome)
         );
     }
 
 
     // =========================================================
-    // ANNUAL MODE
+    // SELECT ANNUAL MODE
     // =========================================================
 
     async selectAnnualMode() {
@@ -473,7 +587,7 @@ class ZakatPendapatanPage {
 
 
     // =========================================================
-    // ANNUAL INCOME
+    // ENTER ANNUAL INCOME
     // =========================================================
 
     async enterAnnualIncome(amount) {
@@ -485,13 +599,13 @@ class ZakatPendapatanPage {
         });
 
         await this.annualIncomeField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // ENTER ANNUAL INFORMATION
+    // ENTER ANNUAL INCOME INFORMATION
     // =========================================================
 
     async enterAnnualIncomeInformation(
@@ -515,7 +629,7 @@ class ZakatPendapatanPage {
 
 
     // =========================================================
-    // VERIFY ANNUAL VALUES
+    // VERIFY ANNUAL INCOME VALUES
     // =========================================================
 
     async verifyAnnualIncomeValues(
@@ -527,25 +641,25 @@ class ZakatPendapatanPage {
         await expect(
             this.annualIncomeField
         ).toHaveValue(
-            annualIncome.toString()
+            String(annualIncome)
         );
 
         await expect(
             this.bonusField
         ).toHaveValue(
-            bonus.toString()
+            String(bonus)
         );
 
         await expect(
             this.otherIncomeField
         ).toHaveValue(
-            otherIncome.toString()
+            String(otherIncome)
         );
     }
 
 
     // =========================================================
-    // NEXT
+    // CLICK NEXT
     // =========================================================
 
     async clickNext() {
@@ -556,12 +670,16 @@ class ZakatPendapatanPage {
             timeout: 15000
         });
 
+        await expect(
+            this.nextButton
+        ).toBeEnabled();
+
         await this.nextButton.click();
     }
 
 
     // =========================================================
-    // PREVIOUS
+    // CLICK PREVIOUS
     // =========================================================
 
     async clickPrevious() {
@@ -572,20 +690,19 @@ class ZakatPendapatanPage {
             timeout: 15000
         });
 
+        await expect(
+            this.previousButton
+        ).toBeEnabled();
+
         await this.previousButton.click();
     }
 
 
     // =========================================================
-    // VERIFY RETURN TO STEP 1
+    // VERIFY RETURNED TO INCOME STEP
     // =========================================================
 
     async verifyReturnedToIncomeStep() {
-
-        /*
-         * Do not use the generated Vaadin ID here because
-         * clicking "Sebelum" can re-render the calculator.
-         */
 
         await expect(
             this.bonusField
@@ -600,11 +717,15 @@ class ZakatPendapatanPage {
         await expect(
             this.nextButton
         ).toBeVisible();
+
+        await expect(
+            this.monthlyIncomeField
+        ).toBeVisible();
     }
 
 
     // =========================================================
-    // VERIFY STEP 2
+    // VERIFY CALCULATOR STEP 2
     // =========================================================
 
     async verifyCalculatorStep2() {
@@ -618,11 +739,23 @@ class ZakatPendapatanPage {
         await expect(
             this.spouseCountField
         ).toBeVisible();
+
+        await expect(
+            this.childExpenseField
+        ).toBeVisible();
+
+        await expect(
+            this.parentExpenseField
+        ).toBeVisible();
+
+        await expect(
+            this.nextButton
+        ).toBeVisible();
     }
 
 
     // =========================================================
-    // PERSONAL EXPENSE
+    // ENTER PERSONAL EXPENSE
     // =========================================================
 
     async enterPersonalExpense(amount) {
@@ -634,37 +767,13 @@ class ZakatPendapatanPage {
         });
 
         await this.personalExpenseField.fill(
-            amount.toString()
+            String(amount)
         );
-    }
-
-
-    async verifyPersonalExpense(amount) {
-
-        await expect(
-            this.personalExpenseField
-        ).toHaveValue(
-            amount.toString()
-        );
-    }
-
-
-    async enterPersonalExpenseAndContinue(amount) {
-
-        await this.enterPersonalExpense(
-            amount
-        );
-
-        await this.verifyPersonalExpense(
-            amount
-        );
-
-        await this.clickNext();
     }
 
 
     // =========================================================
-    // SPOUSE
+    // ENTER SPOUSE COUNT
     // =========================================================
 
     async enterSpouseCount(count) {
@@ -676,23 +785,13 @@ class ZakatPendapatanPage {
         });
 
         await this.spouseCountField.fill(
-            count.toString()
-        );
-    }
-
-
-    async verifySpouseCount(count) {
-
-        await expect(
-            this.spouseCountField
-        ).toHaveValue(
-            count.toString()
+            String(count)
         );
     }
 
 
     // =========================================================
-    // CHILD
+    // ENTER CHILD EXPENSE
     // =========================================================
 
     async enterChildExpense(amount) {
@@ -704,13 +803,13 @@ class ZakatPendapatanPage {
         });
 
         await this.childExpenseField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // PARENT
+    // ENTER PARENT EXPENSE
     // =========================================================
 
     async enterParentExpense(amount) {
@@ -722,13 +821,13 @@ class ZakatPendapatanPage {
         });
 
         await this.parentExpenseField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // MEDICAL
+    // ENTER MEDICAL EXPENSE
     // =========================================================
 
     async enterMedicalExpense(amount) {
@@ -740,13 +839,13 @@ class ZakatPendapatanPage {
         });
 
         await this.medicalExpenseField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // VEHICLE DEBT
+    // ENTER VEHICLE DEBT
     // =========================================================
 
     async enterVehicleDebt(amount) {
@@ -758,13 +857,13 @@ class ZakatPendapatanPage {
         });
 
         await this.vehicleDebtField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // HOUSE DEBT
+    // ENTER HOUSE DEBT
     // =========================================================
 
     async enterHouseDebt(amount) {
@@ -776,16 +875,16 @@ class ZakatPendapatanPage {
         });
 
         await this.houseDebtField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // KWSP
+    // ENTER KWSP DEDUCTION
     // =========================================================
 
-    async enterKwspDeduction(amount) {
+    async enterKWSPDeduction(amount) {
 
         await expect(
             this.kwspDeductionField
@@ -794,13 +893,13 @@ class ZakatPendapatanPage {
         });
 
         await this.kwspDeductionField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // EDUCATION LOAN
+    // ENTER EDUCATION LOAN
     // =========================================================
 
     async enterEducationLoan(amount) {
@@ -812,13 +911,13 @@ class ZakatPendapatanPage {
         });
 
         await this.educationLoanField.fill(
-            amount.toString()
+            String(amount)
         );
     }
 
 
     // =========================================================
-    // TABUNG HAJI
+    // ENTER TABUNG HAJI CONTRIBUTION
     // =========================================================
 
     async enterTabungHajiContribution(amount) {
@@ -830,7 +929,35 @@ class ZakatPendapatanPage {
         });
 
         await this.tabungHajiContributionField.fill(
-            amount.toString()
+            String(amount)
+        );
+    }
+
+
+    // =========================================================
+    // VERIFY PERSONAL EXPENSE
+    // =========================================================
+
+    async verifyPersonalExpense(amount) {
+
+        await expect(
+            this.personalExpenseField
+        ).toHaveValue(
+            String(amount)
+        );
+    }
+
+
+    // =========================================================
+    // VERIFY SPOUSE COUNT
+    // =========================================================
+
+    async verifySpouseCount(count) {
+
+        await expect(
+            this.spouseCountField
+        ).toHaveValue(
+            String(count)
         );
     }
 
@@ -839,78 +966,65 @@ class ZakatPendapatanPage {
     // ENTER MULTIPLE EXPENSES
     // =========================================================
 
-    async enterMultipleExpenses({
+    async enterMultipleExpenses(data) {
 
-        personalExpense,
-        spouseCount,
-        childExpense,
-        parentExpense,
-        medicalExpense,
-        vehicleDebt,
-        houseDebt,
-        kwspDeduction,
-        educationLoan,
-        tabungHajiContribution
-
-    }) {
-
-        if (personalExpense !== undefined) {
+        if (data.personalExpense !== undefined) {
             await this.enterPersonalExpense(
-                personalExpense
+                data.personalExpense
             );
         }
 
-        if (spouseCount !== undefined) {
+        if (data.spouseCount !== undefined) {
             await this.enterSpouseCount(
-                spouseCount
+                data.spouseCount
             );
         }
 
-        if (childExpense !== undefined) {
+        if (data.childExpense !== undefined) {
             await this.enterChildExpense(
-                childExpense
+                data.childExpense
             );
         }
 
-        if (parentExpense !== undefined) {
+        if (data.parentExpense !== undefined) {
             await this.enterParentExpense(
-                parentExpense
+                data.parentExpense
             );
         }
 
-        if (medicalExpense !== undefined) {
+        if (data.medicalExpense !== undefined) {
             await this.enterMedicalExpense(
-                medicalExpense
+                data.medicalExpense
             );
         }
 
-        if (vehicleDebt !== undefined) {
+        if (data.vehicleDebt !== undefined) {
             await this.enterVehicleDebt(
-                vehicleDebt
+                data.vehicleDebt
             );
         }
 
-        if (houseDebt !== undefined) {
+        if (data.houseDebt !== undefined) {
             await this.enterHouseDebt(
-                houseDebt
+                data.houseDebt
             );
         }
 
-        if (kwspDeduction !== undefined) {
-            await this.enterKwspDeduction(
-                kwspDeduction
+        if (data.kwspDeduction !== undefined) {
+            await this.enterKWSPDeduction(
+                data.kwspDeduction
             );
         }
 
-        if (educationLoan !== undefined) {
+        if (data.educationLoan !== undefined) {
             await this.enterEducationLoan(
-                educationLoan
+                data.educationLoan
             );
         }
 
-        if (tabungHajiContribution !== undefined) {
+        if (data.tabungHajiContribution !== undefined) {
             await this.enterTabungHajiContribution(
-                tabungHajiContribution
+                data.tabungHajiContribution
             );
         }
     }
@@ -920,416 +1034,243 @@ class ZakatPendapatanPage {
     // VERIFY MULTIPLE EXPENSES
     // =========================================================
 
-    async verifyMultipleExpenses({
+    async verifyMultipleExpenses(data) {
 
-        personalExpense,
-        spouseCount,
-        childExpense,
-        parentExpense,
-        medicalExpense,
-        vehicleDebt,
-        houseDebt,
-        kwspDeduction,
-        educationLoan,
-        tabungHajiContribution
-
-    }) {
-
-        if (personalExpense !== undefined) {
+        if (data.personalExpense !== undefined) {
 
             await expect(
                 this.personalExpenseField
             ).toHaveValue(
-                personalExpense.toString()
+                String(data.personalExpense)
             );
         }
 
-        if (spouseCount !== undefined) {
+        if (data.spouseCount !== undefined) {
 
             await expect(
                 this.spouseCountField
             ).toHaveValue(
-                spouseCount.toString()
+                String(data.spouseCount)
             );
         }
 
-        if (childExpense !== undefined) {
+        if (data.childExpense !== undefined) {
 
             await expect(
                 this.childExpenseField
             ).toHaveValue(
-                childExpense.toString()
+                String(data.childExpense)
             );
         }
 
-        if (parentExpense !== undefined) {
+        if (data.parentExpense !== undefined) {
 
             await expect(
                 this.parentExpenseField
             ).toHaveValue(
-                parentExpense.toString()
+                String(data.parentExpense)
             );
         }
 
-        if (medicalExpense !== undefined) {
+        if (data.medicalExpense !== undefined) {
 
             await expect(
                 this.medicalExpenseField
             ).toHaveValue(
-                medicalExpense.toString()
+                String(data.medicalExpense)
             );
         }
 
-        if (vehicleDebt !== undefined) {
+        if (data.vehicleDebt !== undefined) {
 
             await expect(
                 this.vehicleDebtField
             ).toHaveValue(
-                vehicleDebt.toString()
+                String(data.vehicleDebt)
             );
         }
 
-        if (houseDebt !== undefined) {
+        if (data.houseDebt !== undefined) {
 
             await expect(
                 this.houseDebtField
             ).toHaveValue(
-                houseDebt.toString()
+                String(data.houseDebt)
             );
         }
 
-        if (kwspDeduction !== undefined) {
+        if (data.kwspDeduction !== undefined) {
 
             await expect(
                 this.kwspDeductionField
             ).toHaveValue(
-                kwspDeduction.toString()
+                String(data.kwspDeduction)
             );
         }
 
-        if (educationLoan !== undefined) {
+        if (data.educationLoan !== undefined) {
 
             await expect(
                 this.educationLoanField
             ).toHaveValue(
-                educationLoan.toString()
+                String(data.educationLoan)
             );
         }
 
-        if (tabungHajiContribution !== undefined) {
+        if (data.tabungHajiContribution !== undefined) {
 
             await expect(
                 this.tabungHajiContributionField
             ).toHaveValue(
-                tabungHajiContribution.toString()
+                String(data.tabungHajiContribution)
             );
         }
     }
 
 
     // =========================================================
-    // VERIFY RESULT SCREEN
+    // OPEN HAUL SELECTION
     // =========================================================
 
-    async verifyCalculationResult() {
+    async openHaulSelection() {
 
         await expect(
-            this.nisabLabel
+            this.haulToggleButton
         ).toBeVisible({
             timeout: 15000
         });
 
-        await expect(
-            this.totalIncomeResultLabel
-        ).toBeVisible();
+        await this.haulToggleButton.click();
+    }
+
+
+    // =========================================================
+    // SELECT HAUL OPTION
+    // =========================================================
+
+    async selectHaulOption(index = 2) {
+
+        const haulOption =
+            this.page.locator(
+                `#vaadin-combo-box-item-${index}`
+            );
 
         await expect(
-            this.totalExpenseResultLabel
-        ).toBeVisible();
+            haulOption
+        ).toBeVisible({
+            timeout: 15000
+        });
+
+        await haulOption.click();
+    }
+
+
+    // =========================================================
+    // ENTER MANUAL ZAKAT AMOUNT
+    // =========================================================
+
+    async enterManualZakatAmount(amount) {
 
         await expect(
-            this.netIncomeResultLabel
-        ).toBeVisible();
+            this.manualZakatAmountField
+        ).toBeVisible({
+            timeout: 15000
+        });
+
+        await this.manualZakatAmountField.fill(
+            String(amount)
+        );
+    }
+
+
+    // =========================================================
+    // VERIFY MANUAL ZAKAT AMOUNT
+    // =========================================================
+
+    async verifyManualZakatAmount(amount) {
 
         await expect(
-            this.monthlyZakatLabel
-        ).toBeVisible();
+            this.manualZakatAmountField
+        ).toHaveValue(
+            String(amount)
+        );
+    }
+
+
+    // =========================================================
+    // VERIFY ADD TO CART BUTTON
+    // =========================================================
+
+    async verifyAddToCartButton() {
 
         await expect(
             this.addToCartButton
-        ).toBeVisible();
-    }
-
-
-    // =========================================================
-    // PARSE RM VALUE
-    // =========================================================
-
-    parseRMValue(text) {
-
-        if (!text) {
-
-            throw new Error(
-                'RM value cannot be parsed because the text is empty.'
-            );
-        }
-
-        const match = text.match(
-            /RM\s*([\d,]+(?:\.\d{1,2})?)/
-        );
-
-        if (!match) {
-
-            throw new Error(
-                `No RM amount was found in text: "${text}"`
-            );
-        }
-
-        const numericText =
-            match[1].replace(/,/g, '');
-
-        const value =
-            Number.parseFloat(numericText);
-
-        if (Number.isNaN(value)) {
-
-            throw new Error(
-                `Unable to convert RM amount to number: "${text}"`
-            );
-        }
-
-        return value;
-    }
-
-
-    // =========================================================
-    // FIND RESULT ROW
-    // =========================================================
-
-    async getResultRowText(labelText) {
-
-        /*
-         * Instead of assuming the direct parent of the label is
-         * the complete row, move upward until an element contains:
-         *
-         * 1. the requested label
-         * 2. an RM amount
-         *
-         * This is safer for the nested Vaadin/Flex layout.
-         */
-
-        const label =
-            this.resultContainer.getByText(
-                labelText,
-                { exact: true }
-            );
-
-        await expect(
-            label
         ).toBeVisible({
             timeout: 15000
         });
 
-        const row =
-            label.locator(
-                'xpath=ancestor::*[' +
-                'contains(normalize-space(.), "RM")' +
-                '][1]'
-            );
+        await expect(
+            this.addToCartButton
+        ).toBeEnabled();
+    }
+
+
+    // =========================================================
+    // ADD TO CART
+    // =========================================================
+
+    async addToCart() {
 
         await expect(
-            row
+            this.addToCartButton
         ).toBeVisible({
             timeout: 15000
         });
 
-        const rowText =
-            await row.innerText();
+        await expect(
+            this.addToCartButton
+        ).toBeEnabled();
 
-        if (!rowText.includes('RM')) {
-
-            throw new Error(
-                `RM amount not found for "${labelText}". ` +
-                `Captured row text: "${rowText}"`
-            );
-        }
-
-        return rowText;
-    }
+        await this.addToCartButton.click();
 
 
-    // =========================================================
-    // GET RESULT VALUE
-    // =========================================================
-
-    async getResultValueByLabel(labelText) {
-
-        const rowText =
-            await this.getResultRowText(
-                labelText
-            );
-
-        return this.parseRMValue(
-            rowText
-        );
-    }
-
-
-    // =========================================================
-    // GET NISAB
-    // =========================================================
-
-    async getNisabValue() {
+        // =====================================================
+        // VERIFY SUCCESS NOTIFICATION
+        // =====================================================
 
         await expect(
-            this.nisabLabel
+            this.addToCartSuccessNotification
         ).toBeVisible({
             timeout: 15000
         });
-
-        const nisabRow =
-            this.nisabLabel.locator(
-                'xpath=ancestor::*[' +
-                'contains(normalize-space(.), "RM")' +
-                '][1]'
-            );
-
-        await expect(
-            nisabRow
-        ).toBeVisible({
-            timeout: 15000
-        });
-
-        const rowText =
-            await nisabRow.innerText();
-
-        return this.parseRMValue(
-            rowText
-        );
     }
 
-
     // =========================================================
-    // GET TOTAL INCOME
-    // =========================================================
+// REMOVE ZAKAT FROM CART
+// =========================================================
 
-    async getTotalIncomeValue() {
+async removeZakatFromCart() {
 
-        return await this.getResultValueByLabel(
-            'Jumlah Pendapatan'
-        );
-    }
+    await expect(
+        this.cartDeleteButton
+    ).toBeVisible({
+        timeout: 15000
+    });
 
+    await expect(
+        this.cartDeleteButton
+    ).toBeEnabled();
 
-    // =========================================================
-    // GET TOTAL EXPENSE
-    // =========================================================
+    await this.cartDeleteButton.click();
 
-    async getTotalExpenseValue() {
-
-        return await this.getResultValueByLabel(
-            'Jumlah Perbelanjaan'
-        );
-    }
-
-
-    // =========================================================
-    // GET NET INCOME
-    // =========================================================
-
-    async getNetIncomeValue() {
-
-        return await this.getResultValueByLabel(
-            'Jumlah Pendapatan Bersih'
-        );
-    }
-
-
-    // =========================================================
-    // VERIFY NET INCOME CALCULATION
-    // =========================================================
-
-    async verifyNetIncomeCalculation() {
-
-        const totalIncome =
-            await this.getTotalIncomeValue();
-
-        const totalExpense =
-            await this.getTotalExpenseValue();
-
-        const netIncome =
-            await this.getNetIncomeValue();
-
-
-        console.log(
-            `Total Income: RM ${totalIncome.toFixed(2)}`
-        );
-
-        console.log(
-            `Total Expense: RM ${totalExpense.toFixed(2)}`
-        );
-
-        console.log(
-            `Net Income: RM ${netIncome.toFixed(2)}`
-        );
-
-
-        const expectedNetIncome =
-            totalIncome - totalExpense;
-
-
-        expect(
-            netIncome
-        ).toBeCloseTo(
-            expectedNetIncome,
-            2
-        );
-
-
-        return {
-            totalIncome,
-            totalExpense,
-            netIncome,
-            expectedNetIncome
-        };
-    }
-
-
-    // =========================================================
-    // VERIFY ABOVE NISAB
-    // =========================================================
-
-    async verifyNetIncomeAboveNisab() {
-
-        const nisab =
-            await this.getNisabValue();
-
-        const netIncome =
-            await this.getNetIncomeValue();
-
-
-        console.log(
-            `Nisab: RM ${nisab.toFixed(2)}`
-        );
-
-        console.log(
-            `Net Income: RM ${netIncome.toFixed(2)}`
-        );
-
-
-        expect(
-            netIncome
-        ).toBeGreaterThan(
-            nisab
-        );
-
-
-        return {
-            nisab,
-            netIncome
-        };
-    }
+    await expect(
+        this.emptyCartRecordMessage
+    ).toBeVisible({
+        timeout: 15000
+    });
 }
+}
+
 
 module.exports = {
     ZakatPendapatanPage
