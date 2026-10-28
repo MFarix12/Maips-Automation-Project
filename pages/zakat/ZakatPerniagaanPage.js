@@ -378,6 +378,32 @@ class ZakatPerniagaanPage {
 
 
         // =========================================================
+        // TC013 - KEUNTUNGAN BERSIH AMOUNT
+        // =========================================================
+
+        this.keuntunganBersihAmount =
+            this.calculatorContainer.getByText(
+                'RM 900,000.00',
+                {
+                    exact: true
+                }
+            );
+
+
+        // =========================================================
+        // TC015 - ABOVE NISAB RESULT
+        // =========================================================
+
+        this.untungRugiAboveNisabResult =
+            this.calculatorContainer.getByText(
+                'Jumlah Zakat yang Perlu Dibayar',
+                {
+                    exact: false
+                }
+            );
+
+
+        // =========================================================
         // PENYATA KEWANGAN - STEP 1 PELABURAN
         // =========================================================
 
@@ -405,6 +431,24 @@ class ZakatPerniagaanPage {
                     exact: true
                 }
             );
+
+
+        // =========================================================
+        // TC020 - DEFAULT JUMLAH PELABURAN AMOUNT
+        // =========================================================
+
+        this.jumlahPelaburanAmount =
+            this.calculatorContainer.getByText(
+                'RM 0.00',
+                {
+                    exact: true
+                }
+            ).last();
+
+
+        // =========================================================
+        // PENYATA NEXT BUTTON
+        // =========================================================
 
         this.penyataNextButton =
             this.calculatorContainer.getByRole(
@@ -544,12 +588,28 @@ class ZakatPerniagaanPage {
         // =========================================================
         // PENYATA KEWANGAN - PENGIRAAN
         // =========================================================
+        //
+        // IMPORTANT:
+        //
+        // exact:true is required.
+        //
+        // Without exact:true, Playwright also matches:
+        //
+        // "Jumlah Aset Bersih = (...)"
+        //
+        // and:
+        //
+        // "Jumlah aset bersih anda tidak mencapai..."
+        //
+        // causing strict-mode violations in TC028-TC033.
+        //
+        // =========================================================
 
         this.jumlahAsetBersihLabel =
             this.calculatorContainer.getByText(
                 'Jumlah Aset Bersih',
                 {
-                    exact: false
+                    exact: true
                 }
             );
 
@@ -722,7 +782,11 @@ class ZakatPerniagaanPage {
                 }
             );
 
-        if (await yearOption.isVisible().catch(() => false)) {
+        if (
+            await yearOption
+                .isVisible()
+                .catch(() => false)
+        ) {
 
             await yearOption.click();
 
@@ -1091,7 +1155,11 @@ class ZakatPerniagaanPage {
                 }
             );
 
-        if (await yearOption.isVisible().catch(() => false)) {
+        if (
+            await yearOption
+                .isVisible()
+                .catch(() => false)
+        ) {
 
             await yearOption.click();
 
@@ -1317,7 +1385,7 @@ class ZakatPerniagaanPage {
         });
 
         await expect(
-            this.zakatResultLabel
+            this.untungRugiAboveNisabResult
         ).toBeVisible({
             timeout: 15000
         });
@@ -1504,19 +1572,20 @@ class ZakatPerniagaanPage {
             timeout: 15000
         });
 
-        const zeroAmount =
-            this.calculatorContainer.getByText(
-                'RM 0.00',
-                {
-                    exact: true
-                }
-            ).last();
-
         await expect(
-            zeroAmount
+            this.jumlahPelaburanAmount
         ).toBeVisible({
             timeout: 15000
         });
+
+        await expect(
+            this.jumlahPelaburanAmount
+        ).toHaveText(
+            'RM 0.00',
+            {
+                timeout: 15000
+            }
+        );
 
         await expect(
             this.penyataNextButton
@@ -2050,11 +2119,6 @@ class ZakatPerniagaanPage {
         const expectedText =
             `RM ${formattedAmount}`;
 
-
-        // =========================================================
-        // VERIFY LABEL
-        // =========================================================
-
         await expect(
             this.jumlahLiabilitiSemasaLabel
         ).toBeVisible({
@@ -2066,29 +2130,17 @@ class ZakatPerniagaanPage {
         // TARGET SUMMARY CARD AMOUNT
         // =========================================================
         //
-        // The same amount can exist in both:
-        //
-        // 1. Vaadin calculation table
-        // 2. Yellow summary card
-        //
-        // The summary amount is rendered as a heading (<h4>).
-        // Targeting the heading prevents strict-mode violations.
+        // The same amount may also exist inside the result table.
+        // The summary value is rendered as an h4 heading.
         //
         // =========================================================
 
         const jumlahLiabilitiSemasaAmount =
-            this.calculatorContainer.getByRole(
-                'heading',
-                {
-                    name: expectedText,
-                    exact: true
-                }
-            );
-
-
-        // =========================================================
-        // VERIFY AMOUNT
-        // =========================================================
+            this.calculatorContainer.locator(
+                'h4'
+            ).filter({
+                hasText: expectedText
+            });
 
         await expect(
             jumlahLiabilitiSemasaAmount
@@ -2151,6 +2203,12 @@ class ZakatPerniagaanPage {
         const expectedText =
             `RM ${formattedAmount}`;
 
+        await expect(
+            this.jumlahAsetBersihLabel
+        ).toBeVisible({
+            timeout: 15000
+        });
+
         const jumlahAsetBersihAmount =
             this.calculatorContainer.getByText(
                 expectedText,
@@ -2158,12 +2216,6 @@ class ZakatPerniagaanPage {
                     exact: true
                 }
             );
-
-        await expect(
-            this.jumlahAsetBersihLabel
-        ).toBeVisible({
-            timeout: 15000
-        });
 
         await expect(
             jumlahAsetBersihAmount
@@ -2240,17 +2292,47 @@ class ZakatPerniagaanPage {
 
     async proceedToFinalPenyataKewanganResult() {
 
-        await expect(
-            this.penyataNextButton
-        ).toBeVisible({
-            timeout: 15000
-        });
+        const nextButtons =
+            this.calculatorContainer.getByRole(
+                'button',
+                {
+                    name: 'Seterusnya',
+                    exact: true
+                }
+            );
 
-        await expect(
-            this.penyataNextButton
-        ).toBeEnabled();
+        const count =
+            await nextButtons.count();
 
-        await this.penyataNextButton.click();
+        for (
+            let index = 0;
+            index < count;
+            index++
+        ) {
+
+            const button =
+                nextButtons.nth(index);
+
+            if (
+                await button
+                    .isVisible()
+                    .catch(() => false)
+            ) {
+
+                await expect(
+                    button
+                ).toBeEnabled();
+
+                await button.click();
+
+                return;
+            }
+        }
+
+        throw new Error(
+            'Visible Seterusnya button was not found ' +
+            'in the Zakat Perniagaan Penyata Kewangan calculator.'
+        );
     }
 
 
@@ -2259,10 +2341,6 @@ class ZakatPerniagaanPage {
     // =============================================================
 
     async verifyFinalPenyataKewanganResult(expectedAmount) {
-
-        // =========================================================
-        // CHECK CURRENT STG APPLICATION DEFECT
-        // =========================================================
 
         const systemErrorVisible =
             await this.unexpectedErrorMessage
@@ -2279,21 +2357,11 @@ class ZakatPerniagaanPage {
             );
         }
 
-
-        // =========================================================
-        // VERIFY FINAL RESULT LABEL
-        // =========================================================
-
         await expect(
             this.penyataKewanganZakatResult
         ).toBeVisible({
             timeout: 15000
         });
-
-
-        // =========================================================
-        // FORMAT EXPECTED AMOUNT
-        // =========================================================
 
         const formattedAmount =
             Number(expectedAmount).toLocaleString(
@@ -2306,11 +2374,6 @@ class ZakatPerniagaanPage {
 
         const expectedText =
             `RM ${formattedAmount}`;
-
-
-        // =========================================================
-        // VERIFY FINAL ZAKAT AMOUNT
-        // =========================================================
 
         const zakatAmount =
             this.calculatorContainer.getByText(
@@ -2334,17 +2397,53 @@ class ZakatPerniagaanPage {
 
     async navigateBackPenyataKewangan() {
 
-        await expect(
-            this.penyataBackButton
-        ).toBeVisible({
-            timeout: 15000
-        });
+        const backButtons =
+            this.calculatorContainer.getByRole(
+                'button',
+                {
+                    name: 'Sebelum',
+                    exact: true
+                }
+            );
 
-        await expect(
-            this.penyataBackButton
-        ).toBeEnabled();
+        const count =
+            await backButtons.count();
 
-        await this.penyataBackButton.click();
+        for (
+            let index = 0;
+            index < count;
+            index++
+        ) {
+
+            const button =
+                backButtons.nth(index);
+
+            if (
+                await button
+                    .isVisible()
+                    .catch(() => false)
+            ) {
+
+                await expect(
+                    button
+                ).toBeEnabled();
+
+                await button.click();
+
+                await expect(
+                    this.akaunBelumBayarField
+                ).toBeVisible({
+                    timeout: 15000
+                });
+
+                return;
+            }
+        }
+
+        throw new Error(
+            'Visible Sebelum button was not found ' +
+            'in the Zakat Perniagaan Penyata Kewangan calculator.'
+        );
     }
 
 
